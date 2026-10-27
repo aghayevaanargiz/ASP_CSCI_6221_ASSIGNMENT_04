@@ -3,7 +3,8 @@
 
 **Course:** Advanced Software Paradigms, CSCI 6221  
 **Semester:** Fall 2026  
-**University:** ADA University 
+**University:** ADA University
+
 **Deadline:** November 3, 2026  
 **Assignment:** A4. Concurrency
 

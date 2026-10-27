@@ -1,5 +1,4 @@
-# Advanced Software Paradigms: A3. Types and OOP Concepts
-
+# Advanced Software Paradigms: A4. Concurrency
 ## Course Information
 
 **Course:** Advanced Software Paradigms, CSCI 6221  

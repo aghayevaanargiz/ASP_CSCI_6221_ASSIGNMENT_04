@@ -53,49 +53,53 @@ public class Main {
             int squareSize = 20;
 
             for (int y = 0; y < image.getHeight(); y += squareSize) {
-            for (int x = 0; x < image.getWidth(); x += squareSize) {
+                for (int x = 0; x < image.getWidth(); x += squareSize) {
 
-            int redSum = 0;
-            int greenSum = 0;
-            int blueSum = 0;
-            int pixelCount = 0;
-    
-            int endX = Math.min(x + squareSize, image.getWidth());
-            int endY = Math.min(y + squareSize, image.getHeight());
-    
-            for (int py = y; py < endY; py++) {
-                for (int px = x; px < endX; px++) {
-    
-                    Color color = new Color(image.getRGB(px, py));
-    
-                    redSum += color.getRed();
-                    greenSum += color.getGreen();
-                    blueSum += color.getBlue();
-    
-                    pixelCount++;
+                    int redSum = 0;
+                    int greenSum = 0;
+                    int blueSum = 0;
+                    int pixelCount = 0;
+
+                    int endX = Math.min(x + squareSize, image.getWidth());
+                    int endY = Math.min(y + squareSize, image.getHeight());
+
+                    for (int py = y; py < endY; py++) {
+                        for (int px = x; px < endX; px++) {
+
+                            Color color = new Color(image.getRGB(px, py));
+
+                            redSum += color.getRed();
+                            greenSum += color.getGreen();
+                            blueSum += color.getBlue();
+
+                            pixelCount++;
+                        }
+                    }
+
+                    int averageRed = redSum / pixelCount;
+                    int averageGreen = greenSum / pixelCount;
+                    int averageBlue = blueSum / pixelCount;
+
+                    Color averageColor = new Color(
+                            averageRed,
+                            averageGreen,
+                            averageBlue);
+
+                    for (int py = y; py < endY; py++) {
+                        for (int px = x; px < endX; px++) {
+                            image.setRGB(px, py, averageColor.getRGB());
+                        }
+                    }
                 }
             }
-    
-            int averageRed = redSum / pixelCount;
-            int averageGreen = greenSum / pixelCount;
-            int averageBlue = blueSum / pixelCount;
-    
-            Color averageColor = new Color(
-                averageRed,
-                averageGreen,
-                averageBlue
-            );
 
-            for (int py = y; py < endY; py++) {
-                for (int px = x; px < endX; px++) {
-                    image.setRGB(px, py, averageColor.getRGB());
-                }
-            }
-        }
-    }
+            ImageIO.write(image, "jpg", new File("result.jpg"));
+
+            System.out.println("Image processing completed.");
+            System.out.println("Result saved as result.jpg");
 
         } catch (Exception e) {
-            System.out.println("Could not load the image.");
+            System.out.println("Could not process the image.");
             e.printStackTrace();
         }
     }

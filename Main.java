@@ -1,5 +1,5 @@
-
 import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
@@ -20,9 +20,28 @@ public class Main {
             JFrame window = new JFrame("Image Averaging");
             window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-            JLabel imageLabel = new JLabel(new ImageIcon(image));
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-            window.add(new JScrollPane(imageLabel));
+            int maxWidth = screenSize.width - 100;
+            int maxHeight = screenSize.height - 150;
+
+            double scale = Math.min(
+                    1.0,
+                    Math.min(
+                            (double) maxWidth / image.getWidth(),
+                            (double) maxHeight / image.getHeight()));
+
+            int displayWidth = (int) (image.getWidth() * scale);
+            int displayHeight = (int) (image.getHeight() * scale);
+
+            Image resizedImage = image.getScaledInstance(
+                    displayWidth,
+                    displayHeight,
+                    Image.SCALE_SMOOTH);
+
+            JLabel imageLabel = new JLabel(new ImageIcon(resizedImage));
+
+            window.add(imageLabel);
             window.pack();
             window.setLocationRelativeTo(null);
             window.setVisible(true);

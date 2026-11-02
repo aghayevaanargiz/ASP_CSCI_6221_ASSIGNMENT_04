@@ -91,6 +91,11 @@ public class Main {
                     image.setRGB(px, py, averageColor.getRGB());
                 }
             }
+                
+            ImageIO.write(image, "jpg", new File("result.jpg"));
+
+            System.out.println("Image processing completed.");
+            System.out.println("Result saved as result.jpg");
         }
     }
 

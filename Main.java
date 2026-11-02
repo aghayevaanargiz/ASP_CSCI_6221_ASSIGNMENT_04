@@ -4,12 +4,12 @@ import java.util.Optional;
 import javax.imageio.ImageIO;
 
 /**
- * Reads the arguments, loads the image, runs the averaging
- * in the chosen mode (S or M) and saves the result.
+ * Entry point. Reads the arguments, loads the image, runs the averaging
+ * in the chosen mode and saves the result.
  */
 public class Main {
 
-    private static final String OUTPUT_FILE = "result_M.jpg";
+    private static final String OUTPUT_FILE = "result.jpg";
 
     public static void main(String[] args) {
         try {
@@ -45,7 +45,14 @@ public class Main {
             averager.processWithMultipleThreads();
         }
 
-        ImageIO.write(image, "jpg", new File(OUTPUT_FILE));
+        boolean saved = ImageIO.write(
+                image, "jpg", new File(OUTPUT_FILE));
+
+        if (!saved) {
+            throw new IllegalStateException(
+                    "No suitable writer found for JPEG format.");
+        }
+
         printSummary(arguments, averager);
     }
 
@@ -53,7 +60,6 @@ public class Main {
      * Returns the image, or null (after printing the reason) if it cannot be
      * loaded.
      */
-    
     private static BufferedImage loadImage(File file) throws Exception {
         if (!file.exists() || !file.isFile()) {
             System.out.println("Image file not found: " + file.getPath());

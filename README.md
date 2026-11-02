@@ -221,9 +221,6 @@ The following comparison demonstrates the results of the image averaging algorit
 
 **Single Threaded Mode**
 
-```bash
-java Main resources/images/large.jpg 20 S
-
 ## Error Handling
 
 The application checks for the following input problems:

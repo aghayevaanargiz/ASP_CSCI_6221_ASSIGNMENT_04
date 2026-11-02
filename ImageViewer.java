@@ -27,14 +27,27 @@ public class ImageViewer {
         displayWidth = displaySize.width;
         displayHeight = displaySize.height;
 
-        imageLabel.setIcon(createIcon(image));
+        ImageIcon initialIcon = createIcon(image);
 
-        JFrame window = new JFrame("Image Averaging");
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.add(imageLabel);
-        window.pack();
-        window.setLocationRelativeTo(null);
-        window.setVisible(true);
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                imageLabel.setIcon(initialIcon);
+
+                JFrame window = new JFrame("Image Averaging");
+                window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                window.add(imageLabel);
+                window.pack();
+                window.setLocationRelativeTo(null);
+                window.setVisible(true);
+            });
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(
+                    "Image window creation was interrupted.", e);
+        } catch (InvocationTargetException e) {
+            throw new IllegalStateException(
+                    "Could not create the image window.", e.getCause());
+        }
     }
 
     /** Scales on the calling thread, then updates the window and waits for it. */
@@ -77,3 +90,4 @@ public class ImageViewer {
                 Math.max(1, (int) (height * scale)));
     }
 }
+

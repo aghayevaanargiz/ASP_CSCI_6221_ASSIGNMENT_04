@@ -50,6 +50,45 @@ public class Main {
             System.out.println("Width: " + image.getWidth());
             System.out.println("Height: " + image.getHeight());
 
+            int squareSize = 20;
+
+            for (int y = 0; y < image.getHeight(); y += squareSize) {
+            for (int x = 0; x < image.getWidth(); x += squareSize) {
+
+            int redSum = 0;
+            int greenSum = 0;
+            int blueSum = 0;
+            int pixelCount = 0;
+    
+            int endX = Math.min(x + squareSize, image.getWidth());
+            int endY = Math.min(y + squareSize, image.getHeight());
+    
+            for (int py = y; py < endY; py++) {
+                for (int px = x; px < endX; px++) {
+    
+                    Color color = new Color(image.getRGB(px, py));
+    
+                    redSum += color.getRed();
+                    greenSum += color.getGreen();
+                    blueSum += color.getBlue();
+    
+                    pixelCount++;
+                }
+            }
+    
+            int averageRed = redSum / pixelCount;
+            int averageGreen = greenSum / pixelCount;
+            int averageBlue = blueSum / pixelCount;
+    
+            System.out.println(
+                "Square at (" + x + ", " + y + "): RGB("
+                + averageRed + ", "
+                + averageGreen + ", "
+                + averageBlue + ")"
+            );
+        }
+    }
+
         } catch (Exception e) {
             System.out.println("Could not load the image.");
             e.printStackTrace();

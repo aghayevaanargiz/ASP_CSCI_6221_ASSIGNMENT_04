@@ -80,12 +80,17 @@ public class Main {
             int averageGreen = greenSum / pixelCount;
             int averageBlue = blueSum / pixelCount;
     
-            System.out.println(
-                "Square at (" + x + ", " + y + "): RGB("
-                + averageRed + ", "
-                + averageGreen + ", "
-                + averageBlue + ")"
+            Color averageColor = new Color(
+                averageRed,
+                averageGreen,
+                averageBlue
             );
+
+            for (int py = y; py < endY; py++) {
+                for (int px = x; px < endX; px++) {
+                    image.setRGB(px, py, averageColor.getRGB());
+                }
+            }
         }
     }
 

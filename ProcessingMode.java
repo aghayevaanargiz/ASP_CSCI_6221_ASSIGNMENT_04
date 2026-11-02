@@ -1,4 +1,4 @@
-/** The two supported processing modes, S for Single thread and M for Multiple thread, selected by a command line symbol. */
+/** The two supported processing modes, selected by a command line symbol. */
 
 public enum ProcessingMode {
 

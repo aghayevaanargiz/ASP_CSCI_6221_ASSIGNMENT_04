@@ -3,13 +3,14 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 public class Main {
 
     public static void main(String[] args) {
         try {
-            if (args.length < 3) {
+            if (args.length != 3) {
                 System.out.println(
                         "Usage: java Main <image> <squareSize> <S/M>");
                 return;
@@ -32,10 +33,16 @@ public class Main {
                 return;
             }
 
-            String mode = args[2].toUpperCase();
+            String mode = args[2].toUpperCase(Locale.ROOT);
 
             if (!mode.equals("S") && !mode.equals("M")) {
                 System.out.println("Mode must be S or M.");
+                return;
+            }
+
+            if (!file.exists() || !file.isFile()) {
+                System.out.println(
+                        "Image file not found: " + file.getPath());
                 return;
             }
 
@@ -43,18 +50,17 @@ public class Main {
 
             if (image == null) {
                 System.out.println(
-                        "The file is not a valid image.");
+                        "The file is not a valid image format.");
                 return;
             }
 
             int width = image.getWidth();
             int height = image.getHeight();
 
-            Dimension screenSize =
-                    Toolkit.getDefaultToolkit().getScreenSize();
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-            int maxWidth = screenSize.width - 100;
-            int maxHeight = screenSize.height - 150;
+            int maxWidth = Math.max(1, screenSize.width - 100);
+            int maxHeight = Math.max(1, screenSize.height - 150);
 
             double scale = Math.min(
                     1.0,
@@ -124,11 +130,10 @@ public class Main {
                             }
                         }
 
-                        Image resizedImage =
-                                image.getScaledInstance(
-                                        displayWidth,
-                                        displayHeight,
-                                        Image.SCALE_FAST);
+                        Image resizedImage = image.getScaledInstance(
+                                displayWidth,
+                                displayHeight,
+                                Image.SCALE_FAST);
 
                         SwingUtilities.invokeAndWait(() -> {
                             imageLabel.setIcon(
@@ -142,20 +147,19 @@ public class Main {
 
             } else {
 
+                int totalSquareRows = (height + squareSize - 1) / squareSize;
+
                 int threadCount = Math.min(
                         Runtime.getRuntime().availableProcessors(),
-                        (height + squareSize - 1) / squareSize);
+                        totalSquareRows);
 
-                int squaresPerThread =
-                        ((height + squareSize - 1) / squareSize
-                                + threadCount - 1) / threadCount;
+                int squaresPerThread = (totalSquareRows + threadCount - 1)
+                        / threadCount;
 
-                CountDownLatch latch =
-                        new CountDownLatch(threadCount);
+                CountDownLatch latch = new CountDownLatch(threadCount);
 
                 for (int i = 0; i < threadCount; i++) {
-                    final int startY =
-                            i * squaresPerThread * squareSize;
+                    final int startY = i * squaresPerThread * squareSize;
 
                     final int endY = Math.min(
                             startY + squaresPerThread * squareSize,
@@ -163,13 +167,9 @@ public class Main {
 
                     Thread worker = new Thread(() -> {
                         try {
-                            for (int y = startY;
-                                    y < endY;
-                                    y += squareSize) {
+                            for (int y = startY; y < endY; y += squareSize) {
 
-                                for (int x = 0;
-                                        x < width;
-                                        x += squareSize) {
+                                for (int x = 0; x < width; x += squareSize) {
 
                                     int redSum = 0;
                                     int greenSum = 0;
@@ -181,12 +181,8 @@ public class Main {
                                     int squareEndY = Math.min(
                                             y + squareSize, height);
 
-                                    for (int py = y;
-                                            py < squareEndY;
-                                            py++) {
-                                        for (int px = x;
-                                                px < squareEndX;
-                                                px++) {
+                                    for (int py = y; py < squareEndY; py++) {
+                                        for (int px = x; px < squareEndX; px++) {
 
                                             Color color = new Color(
                                                     image.getRGB(px, py));
@@ -203,12 +199,8 @@ public class Main {
                                             greenSum / pixelCount,
                                             blueSum / pixelCount);
 
-                                    for (int py = y;
-                                            py < squareEndY;
-                                            py++) {
-                                        for (int px = x;
-                                                px < squareEndX;
-                                                px++) {
+                                    for (int py = y; py < squareEndY; py++) {
+                                        for (int px = x; px < squareEndX; px++) {
                                             image.setRGB(
                                                     px, py,
                                                     averageColor.getRGB());
@@ -235,11 +227,10 @@ public class Main {
                     try {
                         while (latch.getCount() > 0) {
                             SwingUtilities.invokeLater(() -> {
-                                Image resizedImage =
-                                        image.getScaledInstance(
-                                                displayWidth,
-                                                displayHeight,
-                                                Image.SCALE_FAST);
+                                Image resizedImage = image.getScaledInstance(
+                                        displayWidth,
+                                        displayHeight,
+                                        Image.SCALE_FAST);
 
                                 imageLabel.setIcon(
                                         new ImageIcon(resizedImage));
@@ -253,7 +244,9 @@ public class Main {
                     }
                 });
 
+                previewThread.setDaemon(true);
                 previewThread.start();
+
                 latch.await();
                 previewThread.interrupt();
 
@@ -284,6 +277,9 @@ public class Main {
                                 (height + squareSize - 1) / squareSize));
             }
 
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.out.println("Image processing was interrupted.");
         } catch (Exception e) {
             System.out.println("Could not process the image.");
             e.printStackTrace();

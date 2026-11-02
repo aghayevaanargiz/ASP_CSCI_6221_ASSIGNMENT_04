@@ -92,6 +92,14 @@ public class Main {
                     }
                 }
             }
+            
+            Image resizedImage = image.getScaledInstance(
+                    displayWidth,
+                    displayHeight,
+                    Image.SCALE_FAST);
+            
+            imageLabel.setIcon(new ImageIcon(resizedImage));
+            imageLabel.repaint();
 
             ImageIO.write(image, "jpg", new File("result.jpg"));
 

@@ -3,6 +3,8 @@ import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Replaces every square of the image with its average color,
@@ -57,11 +59,13 @@ public class ImageAverager {
                 / threadCount;
 
         CountDownLatch latch = new CountDownLatch(threadCount);
+        AtomicReference<Throwable> workerError = new AtomicReference<>();
 
         for (int i = 0; i < threadCount; i++) {
             int startY = i * squaresPerThread * squareSize;
             int endY = Math.min(startY + squaresPerThread * squareSize, height);
-            createWorker(startY, endY, latch).start();
+
+            createWorker(startY, endY, latch, workerError).start();
         }
 
         Thread previewThread = createPreviewThread(latch);
@@ -70,13 +74,22 @@ public class ImageAverager {
         latch.await();
         previewThread.interrupt();
 
+        Throwable error = workerError.get();
+        if (error != null) {
+            throw new IllegalStateException(
+                    "Image processing failed in a worker thread.", error);
+        }
+
         viewer.refreshAndWait(image);
     }
 
-    private Thread createWorker(int startY, int endY, CountDownLatch latch) {
+    private Thread createWorker(int startY, int endY,
+            CountDownLatch latch, AtomicReference<Throwable> workerError) {
         return new Thread(() -> {
             try {
                 averageRows(startY, endY);
+            } catch (Throwable e) {
+                workerError.compareAndSet(null, e);
             } finally {
                 latch.countDown();
             }

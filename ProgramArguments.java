@@ -63,3 +63,4 @@ public class ProgramArguments {
         return Optional.of(new ProgramArguments(file, squareSize, mode));
     }
 }
+

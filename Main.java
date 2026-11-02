@@ -22,7 +22,19 @@ public class Main {
                 return;
             }
 
-            int squareSize = 20;
+            int squareSize;
+
+            try {
+                squareSize = Integer.parseInt(args[1]);
+            
+                if (squareSize <= 0) {
+                    System.out.println("Square size must be positive.");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Square size must be an integer.");
+                return;
+            }
 
             JFrame window = new JFrame("Image Averaging");
             window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -17,8 +17,13 @@ public class Main {
                 return;
             }
 
+            int squareSize = 20;
+
             JFrame window = new JFrame("Image Averaging");
             window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            JLabel imageLabel = new JLabel();
+            window.add(imageLabel);
 
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -34,23 +39,10 @@ public class Main {
             int displayWidth = (int) (image.getWidth() * scale);
             int displayHeight = (int) (image.getHeight() * scale);
 
-            Image resizedImage = image.getScaledInstance(
-                    displayWidth,
-                    displayHeight,
-                    Image.SCALE_SMOOTH);
-
-            JLabel imageLabel = new JLabel(new ImageIcon(resizedImage));
-
-            window.add(imageLabel);
             window.pack();
+            window.setSize(displayWidth, displayHeight);
             window.setLocationRelativeTo(null);
             window.setVisible(true);
-
-            System.out.println("Image loaded successfully.");
-            System.out.println("Width: " + image.getWidth());
-            System.out.println("Height: " + image.getHeight());
-
-            int squareSize = 20;
 
             for (int y = 0; y < image.getHeight(); y += squareSize) {
                 for (int x = 0; x < image.getWidth(); x += squareSize) {
@@ -90,16 +82,23 @@ public class Main {
                             image.setRGB(px, py, averageColor.getRGB());
                         }
                     }
+
+                    Image resizedImage = image.getScaledInstance(
+                            displayWidth,
+                            displayHeight,
+                            Image.SCALE_FAST);
+
+                    imageLabel.setIcon(new ImageIcon(resizedImage));
+                    imageLabel.repaint();
+
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
                 }
             }
-            
-            Image resizedImage = image.getScaledInstance(
-                    displayWidth,
-                    displayHeight,
-                    Image.SCALE_FAST);
-            
-            imageLabel.setIcon(new ImageIcon(resizedImage));
-            imageLabel.repaint();
 
             ImageIO.write(image, "jpg", new File("result.jpg"));
 

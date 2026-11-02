@@ -8,7 +8,12 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            File file = new File("sample.jpg");
+            if (args.length < 3) {
+                System.out.println("Usage: java Main <image> <squareSize> <S/M>");
+                return;
+            }
+            
+            File file = new File(args[0]);
 
             BufferedImage image = ImageIO.read(file);
 

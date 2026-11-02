@@ -194,6 +194,35 @@ Testing has been performed manually from the terminal in Visual Studio Code on W
 | Zero square size | `java Main sample.jpg 0 S` | A positive size validation message is printed. | Passed |
 | Large image display | A large image was run through the application. | The displayed preview fits the screen while processing and output use the original image dimensions. | Passed |
 
+## Image Processing Results
+
+The following comparison demonstrates the results of the image averaging algorithm using a square size of `20`.
+
+<table>
+  <tr>
+    <th align="center">Original Image</th>
+    <th align="center">Single Threaded (S)</th>
+    <th align="center">Multithreaded (M)</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="resources/large.jpg" alt="Original Image" width="280">
+    </td>
+    <td align="center">
+      <img src="resources/result_s.jpg" alt="Single Threaded Result" width="280">
+    </td>
+    <td align="center">
+      <img src="resources/result_m.jpg" alt="Multithreaded Result" width="280">
+    </td>
+  </tr>
+</table>
+
+### Run the Application
+
+**Single Threaded Mode**
+
+```bash
+java Main resources/images/large.jpg 20 S
 
 ## Error Handling
 

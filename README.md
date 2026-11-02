@@ -34,12 +34,19 @@ The processed image is saved as `result.jpg` in the current working directory.
 All five Java source files are in the same directory and use the default package. No additional source folders or packages are required.
 
 ```text
-A4/
-├── Main.java
-├── ProcessingMode.java
-├── ProgramArguments.java
-├── ImageViewer.java
-├── ImageAverager.java
+ASP_CSCI_6221_ASSIGNMENT_04/
+│
+├── src/
+│   ├── Main.java
+│   ├── ImageAverager.java
+│   ├── ImageViewer.java
+│   ├── ProgramArguments.java
+│   └── ProcessingMode.java
+│
+├── resources/
+│   └── images/
+│
+├── .gitignore
 └── README.md
 ```
 

@@ -149,10 +149,11 @@ public class ImageAverager {
 
     private Color calculateAverageColor(int startX, int startY,
             int endX, int endY) {
-        int redSum = 0;
-        int greenSum = 0;
-        int blueSum = 0;
-        int pixelCount = 0;
+        
+        long redSum = 0;
+        long greenSum = 0;
+        long blueSum = 0;
+        long pixelCount = 0;
 
         for (int py = startY; py < endY; py++) {
             for (int px = startX; px < endX; px++) {

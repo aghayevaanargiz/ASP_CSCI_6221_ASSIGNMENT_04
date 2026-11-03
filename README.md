@@ -111,17 +111,16 @@ javac -version
 
 Open a terminal in the project root directory, the directory containing `src` and `README.md`.
 
-### 3. Add an Input Image
+### 3. Provide an Input Image
 
-Place an image in the local `recources` directory, or use an image path elsewhere on your computer.
+The repository does not include sample images.
 
-For example:
+Provide your own image file in a location on your computer. You can use an absolute path or a relative path when running the application.
 
+For example, if your image is located in the project root directory:
 ```text
-recources/large.jpg
+sample.jpg
 ```
-
-The image files are excluded from Git tracking. Each user must provide an image locally to run the application.
 
 ### 4. Compile the Source Files
 

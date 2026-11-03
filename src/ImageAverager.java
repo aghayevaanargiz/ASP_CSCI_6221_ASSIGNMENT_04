@@ -119,22 +119,23 @@ public class ImageAverager {
         return previewThread;
     }
 
-    private void averageRows(int startY, int endY) {
-        for (int y = startY; y < endY; y += squareSize) {
+   private void averageRows(int startRow, int endRow)
+            throws InterruptedException {
+    
+        private void averageRows(int startRow, int endRow)
+            throws InterruptedException {
+    
+        for (int y = startRow; y < endRow; y++) {
+    
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException("Image processing interrupted");
+            }
+    
             for (int x = 0; x < width; x += squareSize) {
                 averageSquare(x, y);
-
-                try {
-                    Thread.sleep(SQUARE_DELAY_MS);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return;
-                }
             }
         }
     }
-
-    // Shared square logic
 
     /** Averages the square whose top left corner is (x, y) and paints it. */
    private void averageSquare(int x, int y) {

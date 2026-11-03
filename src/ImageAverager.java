@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Replaces every square of the image with its average color,
- * either with one thread or with several threads working on bands of rows.
+ * either with one thread or with several threads working on separate bands.
  */
 
 public class ImageAverager {
@@ -20,7 +20,8 @@ public class ImageAverager {
     private final int width;
     private final int height;
 
-    public ImageAverager(BufferedImage image, int squareSize, ImageViewer viewer) {
+    public ImageAverager(
+            BufferedImage image, int squareSize, ImageViewer viewer) {
         this.image = image;
         this.squareSize = squareSize;
         this.viewer = viewer;
@@ -28,17 +29,18 @@ public class ImageAverager {
         this.height = image.getHeight();
     }
 
-    /** Number of worker threads used by the multi threaded mode. */
+    /** Returns the number of worker threads used in multi-thread mode. */
     public int getThreadCount() {
         return Math.min(
                 Runtime.getRuntime().availableProcessors(),
                 getTotalSquareRows());
     }
 
-    // Single thread mode
+    // Single-thread mode
 
     public void processWithSingleThread()
             throws InterruptedException, InvocationTargetException {
+
         for (int y = 0; y < height; y += squareSize) {
             for (int x = 0; x < width; x += squareSize) {
                 averageSquare(x, y);
@@ -48,20 +50,28 @@ public class ImageAverager {
         }
     }
 
-    // Multi thread mode
+    // Multi-thread mode
 
     public void processWithMultipleThreads()
             throws InterruptedException, InvocationTargetException {
+
         int threadCount = getThreadCount();
-        int squaresPerThread = (getTotalSquareRows() + threadCount - 1)
-                / threadCount;
+
+        int totalSquareRows = getTotalSquareRows();
+
+        int squaresPerThread = (totalSquareRows + threadCount - 1) / threadCount;
 
         CountDownLatch latch = new CountDownLatch(threadCount);
+
         AtomicReference<Throwable> workerError = new AtomicReference<>();
 
         for (int i = 0; i < threadCount; i++) {
+
             int startY = i * squaresPerThread * squareSize;
-            int endY = Math.min(startY + squaresPerThread * squareSize, height);
+
+            int endY = (int) Math.min(
+                    (long) startY + (long) squaresPerThread * squareSize,
+                    height);
 
             createWorker(startY, endY, latch, workerError).start();
         }
@@ -69,20 +79,32 @@ public class ImageAverager {
         Thread previewThread = createPreviewThread(latch);
         previewThread.start();
 
-        latch.await();
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            previewThread.interrupt();
+            throw e;
+        }
+
         previewThread.interrupt();
 
         Throwable error = workerError.get();
+
         if (error != null) {
             throw new IllegalStateException(
-                    "Image processing failed in a worker thread.", error);
+                    "Image processing failed in a worker thread.",
+                    error);
         }
 
         viewer.refreshAndWait(image);
     }
 
-    private Thread createWorker(int startY, int endY,
-            CountDownLatch latch, AtomicReference<Throwable> workerError) {
+    private Thread createWorker(
+            int startY,
+            int endY,
+            CountDownLatch latch,
+            AtomicReference<Throwable> workerError) {
+
         return new Thread(() -> {
             try {
                 averageRows(startY, endY);
@@ -94,20 +116,17 @@ public class ImageAverager {
         });
     }
 
-    /** Periodically refreshes the window while the workers are running. */
-
+    /** Periodically creates a snapshot and updates the preview. */
     private Thread createPreviewThread(CountDownLatch latch) {
+
         Thread previewThread = new Thread(() -> {
             try {
                 while (latch.getCount() > 0) {
-                    BufferedImage previewImage = new BufferedImage(
-                            width, height, BufferedImage.TYPE_INT_RGB);
 
-                    synchronized (image) {
-                        previewImage.setData(image.getData());
-                    }
+                    BufferedImage previewImage = createSnapshot();
 
                     viewer.refreshLater(previewImage);
+
                     Thread.sleep(PREVIEW_INTERVAL_MS);
                 }
             } catch (InterruptedException e) {
@@ -116,73 +135,115 @@ public class ImageAverager {
         });
 
         previewThread.setDaemon(true);
+
         return previewThread;
     }
 
-   private void averageRows(int startRow, int endRow)
-            throws InterruptedException {
-    
-        private void averageRows(int startRow, int endRow)
-            throws InterruptedException {
-    
-        for (int y = startRow; y < endRow; y++) {
-    
-            if (Thread.currentThread().isInterrupted()) {
-                throw new InterruptedException("Image processing interrupted");
-            }
-    
-            for (int x = 0; x < width; x += squareSize) {
-                averageSquare(x, y);
-            }
-        }
-    }
+    /**
+     * Creates a consistent copy of the image for preview.
+     * Each worker writes only to its own rows.
+     */
+    private BufferedImage createSnapshot() {
 
-    /** Averages the square whose top left corner is (x, y) and paints it. */
-   private void averageSquare(int x, int y) {
-        int endX = (int) Math.min((long) x + squareSize, width);
-        int endY = (int) Math.min((long) y + squareSize, height);
-    
+        BufferedImage previewImage = new BufferedImage(
+                width,
+                height,
+                BufferedImage.TYPE_INT_RGB);
+
         synchronized (image) {
-            Color averageColor = calculateAverageColor(x, y, endX, endY);
-            fillArea(x, y, endX, endY, averageColor);
+            previewImage.setData(image.getData());
+        }
+
+        return previewImage;
+    }
+
+    private void averageRows(int startY, int endY)
+            throws InterruptedException {
+
+        for (int y = startY; y < endY; y += squareSize) {
+
+            for (int x = 0; x < width; x += squareSize) {
+
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException(
+                            "Image processing was interrupted.");
+                }
+
+                averageSquare(x, y);
+
+                Thread.sleep(SQUARE_DELAY_MS);
+            }
         }
     }
 
-    private Color calculateAverageColor(int startX, int startY,
-            int endX, int endY) {
-        
+    // Shared square processing logic
+
+    /** Calculates and paints the average color of one square. */
+    private void averageSquare(int x, int y) {
+
+        int endX = (int) Math.min((long) x + squareSize, width);
+
+        int endY = (int) Math.min((long) y + squareSize, height);
+
+        Color averageColor = calculateAverageColor(
+                x, y, endX, endY);
+
+        fillArea(x, y, endX, endY, averageColor);
+    }
+
+    private Color calculateAverageColor(
+            int startX,
+            int startY,
+            int endX,
+            int endY) {
+
         long redSum = 0;
         long greenSum = 0;
         long blueSum = 0;
         long pixelCount = 0;
 
         for (int py = startY; py < endY; py++) {
+
             for (int px = startX; px < endX; px++) {
-                Color color = new Color(image.getRGB(px, py));
+
+                int rgb = image.getRGB(px, py);
+
+                Color color = new Color(rgb);
 
                 redSum += color.getRed();
                 greenSum += color.getGreen();
                 blueSum += color.getBlue();
+
                 pixelCount++;
             }
         }
 
-        int averageRed = (int) (redSum / pixelCount);
-        int averageGreen = (int) (greenSum / pixelCount);
-        int averageBlue = (int) (blueSum / pixelCount);
-        
-        return new Color(averageRed, averageGreen, averageBlue);
-        
-    private void fillArea(int startX, int startY, int endX, int endY,
+        return new Color(
+                (int) (redSum / pixelCount),
+                (int) (greenSum / pixelCount),
+                (int) (blueSum / pixelCount));
+    }
+
+    private void fillArea(
+            int startX,
+            int startY,
+            int endX,
+            int endY,
             Color color) {
+
+        int rgb = color.getRGB();
+
         for (int py = startY; py < endY; py++) {
+
             for (int px = startX; px < endX; px++) {
-                image.setRGB(px, py, color.getRGB());
+
+                image.setRGB(px, py, rgb);
             }
         }
     }
 
     private int getTotalSquareRows() {
-        return (height + squareSize - 1) / squareSize;
+
+        return (int) (((long) height + squareSize - 1) / squareSize);
     }
 }

@@ -52,8 +52,6 @@ A4.Concurrency/
 └── README.md
 ```
 
-The `recources` directory is intended for local input images and is excluded from Git tracking. You can use your own image file when running the application.
-
 ### Source File Responsibilities
 
 | File | Responsibility |
@@ -115,22 +113,41 @@ Open a terminal in the project root directory, the directory containing `src` an
 
 The repository does not include sample images.
 
-Provide your own image file in a location on your computer. You can use an absolute path or a relative path when running the application.
+Provide your own image file on your computer. You can use either an absolute path or a relative path when running the application.
 
 For example, if your image is located in the project root directory:
+
 ```text
 sample.jpg
 ```
 
-### 4. Compile the Source Files
+You can also provide a path to an image stored in another directory.
 
-From the project root directory, create an output directory:
+### 4. Create the Output Directory
 
-```bash
-mkdir out
+The compiled Java files will be stored in an `out` directory.
+
+On Windows Command Prompt:
+
+```cmd
+if not exist out mkdir out
 ```
 
-Compile all Java source files:
+On Windows PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Force out
+```
+
+On macOS or Linux:
+
+```bash
+mkdir -p out
+```
+
+### 5. Compile the Source Files
+
+From the project root directory, run:
 
 ```bash
 javac -d out src/Main.java src/ProcessingMode.java src/ProgramArguments.java src/ImageViewer.java src/ImageAverager.java
@@ -138,25 +155,25 @@ javac -d out src/Main.java src/ProcessingMode.java src/ProgramArguments.java src
 
 If compilation succeeds, the compiled `.class` files will be placed in the `out` directory.
 
-### 5. Run in Single Threaded Mode
+### 6. Run in Single Threaded Mode
 
 ```bash
-java -cp out Main recources/large.jpg 20 S
+java -cp out Main sample.jpg 20 S
 ```
 
 In this mode, one thread processes the square regions sequentially.
 
-### 6. Run in Multithreaded Mode
+### 7. Run in Multithreaded Mode
 
 ```bash
-java -cp out Main recources/large.jpg 20 M
+java -cp out Main sample.jpg 20 M
 ```
 
 In this mode, the image is divided into bands of square rows. Worker threads process separate bands concurrently.
 
 The number of worker threads is based on the available processors and the number of square rows.
 
-### 7. Command Line Arguments
+### 8. Command Line Arguments
 
 The application expects exactly three arguments:
 
@@ -166,13 +183,13 @@ java Main <image> <squareSize> <S/M>
 
 | Argument | Description | Example |
 |---|---|---|
-| `image` | Path to the input image | `recources/large.jpg` |
+| `image` | Path to the input image | `sample.jpg` |
 | `squareSize` | Positive integer defining the width and height of each square region | `20` |
 | `S/M` | Processing mode. `S` means single threaded and `M` means multithreaded. | `M` |
 
 The processing mode is case insensitive. Both `s` and `S` select single threaded processing.
 
-### 8. Output
+### 9. Output
 
 After successful processing, the application writes:
 
@@ -183,6 +200,8 @@ result.jpg
 The output is saved in the current working directory, which should be the project root when following the instructions above.
 
 If a file with that name already exists, it is overwritten.
+
+The generated `result.jpg` file is excluded from Git tracking through `.gitignore`.
 
 ## Processing Details
 
@@ -220,17 +239,16 @@ Testing has been performed manually from the terminal in Visual Studio Code on W
 
 | Test | Command or setup | Expected behavior | Result |
 |---|---|---|---|
-| Single threaded processing | `java -cp out Main recources/large.jpg 20 S` | Image is processed and `result.jpg` is saved. | Passed |
-| Multithreaded processing | `java -cp out Main recources/large.jpg 20 M` | Image is processed using multiple worker threads and `result.jpg` is saved. | Passed |
+| Single threaded processing | `java -cp out Main sample.jpg 20 S` | Image is processed and `result.jpg` is saved. | Passed |
+| Multithreaded processing | `java -cp out Main sample.jpg 20 M` | Image is processed using multiple worker threads and `result.jpg` is saved. | Passed |
 | Different square sizes in multithreaded mode | Square sizes `50` and `20` | Both sizes are processed successfully. | Passed |
-| Square size larger than the image | `java -cp out Main recources/large.jpg 10000 S` | The entire image becomes one average color region. | Passed |
+| Square size larger than the image | `java -cp out Main sample.jpg 10000 S` | The entire image becomes one average color region. | Passed |
 | Missing arguments | Run without arguments | Usage information is printed and processing does not start. | Passed |
-| Non integer square size | `java -cp out Main recources/large.jpg abc S` | An integer validation message is printed. | Passed |
-| Zero square size | `java -cp out Main recources/large.jpg 0 S` | A positive size validation message is printed. | Passed |
+| Non integer square size | `java -cp out Main sample.jpg abc S` | An integer validation message is printed. | Passed |
+| Zero square size | `java -cp out Main sample.jpg 0 S` | A positive size validation message is printed. | Passed |
 | Large image display | Run the application with a large image | The preview fits the screen while processing uses the original image dimensions. | Passed |
 
 The tests above were performed manually. macOS testing has not yet been confirmed.
-
 
 ## Error Handling
 

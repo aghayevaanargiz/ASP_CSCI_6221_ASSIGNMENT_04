@@ -166,12 +166,12 @@ public class ImageAverager {
             }
         }
 
-        return new Color(
-                redSum / pixelCount,
-                greenSum / pixelCount,
-                blueSum / pixelCount);
-    }
-
+        int averageRed = (int) (redSum / pixelCount);
+        int averageGreen = (int) (greenSum / pixelCount);
+        int averageBlue = (int) (blueSum / pixelCount);
+        
+        return new Color(averageRed, averageGreen, averageBlue);
+        
     private void fillArea(int startX, int startY, int endX, int endY,
             Color color) {
         for (int py = startY; py < endY; py++) {

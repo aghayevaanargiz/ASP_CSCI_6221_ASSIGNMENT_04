@@ -137,10 +137,10 @@ public class ImageAverager {
     // Shared square logic
 
     /** Averages the square whose top left corner is (x, y) and paints it. */
-    private void averageSquare(int x, int y) {
-        int endX = Math.min(x + squareSize, width);
-        int endY = Math.min(y + squareSize, height);
-
+   private void averageSquare(int x, int y) {
+        int endX = (int) Math.min((long) x + squareSize, width);
+        int endY = (int) Math.min((long) y + squareSize, height);
+    
         synchronized (image) {
             Color averageColor = calculateAverageColor(x, y, endX, endY);
             fillArea(x, y, endX, endY, averageColor);

@@ -1,6 +1,9 @@
 # Compiled Java files
 *.class
 
+# Compiled output directory
+out/
+
 # VS Code workspace settings
 .vscode/
 
@@ -8,5 +11,9 @@
 .DS_Store
 Thumbs.db
 
-# Generated output image
+# Generated output images
 result.jpg
+
+# Local image resources
+/recources/*
+!/recources/.gitkeep

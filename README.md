@@ -198,24 +198,9 @@ Testing has been performed manually from the terminal in Visual Studio Code on W
 
 The following comparison demonstrates the results of the image averaging algorithm using a square size of `20`.
 
-<table>
-  <tr>
-    <th align="center">Original Image</th>
-    <th align="center">Single Threaded (S)</th>
-    <th align="center">Multithreaded (M)</th>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="resources/large.jpg" alt="Original Image" width="280">
-    </td>
-    <td align="center">
-      <img src="resources/result_s.jpg" alt="Single Threaded Result" width="280">
-    </td>
-    <td align="center">
-      <img src="resources/result_m.jpg" alt="Multithreaded Result" width="280">
-    </td>
-  </tr>
-</table>
+| Original Image | Single Threaded (S) | Multithreaded (M) |
+|:---:|:---:|:---:|
+| ![Original Image](resources/large.jpg) | ![Single Threaded Result](resources/result_s.jpg) | ![Multithreaded Result](resources/result_m.jpg) |
 
 ### Run the Application
 

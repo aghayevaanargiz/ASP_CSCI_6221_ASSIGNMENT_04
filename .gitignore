@@ -11,9 +11,5 @@ out/
 .DS_Store
 Thumbs.db
 
-# Generated output images
+# Generated application output
 result.jpg
-
-# Local image resources
-/resources/*
-!/resources/.gitkeep

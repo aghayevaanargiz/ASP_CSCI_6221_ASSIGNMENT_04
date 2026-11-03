@@ -48,9 +48,6 @@ A4.Concurrency/
 │   ├── ProgramArguments.java
 │   └── ProcessingMode.java
 │
-├── recources/
-│   └── .gitkeep
-│
 ├── .gitignore
 └── README.md
 ```

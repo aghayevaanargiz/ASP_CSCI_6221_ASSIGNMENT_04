@@ -15,5 +15,5 @@ Thumbs.db
 result.jpg
 
 # Local image resources
-/recources/*
-!/recources/.gitkeep
+/resources/*
+!/resources/.gitkeep

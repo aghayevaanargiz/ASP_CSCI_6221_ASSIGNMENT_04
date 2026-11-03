@@ -235,13 +235,6 @@ Testing has been performed manually from the terminal in Visual Studio Code on W
 
 The tests above were performed manually. macOS testing has not yet been confirmed.
 
-## Image Processing Results
-
-The following comparison demonstrates the results of the image averaging algorithm using a square size of `20`.
-
-| Original Image | Single Threaded (S) | Multithreaded (M) |
-|:---:|:---:|:---:|
-| ![Original Image](resources/large.jpg) | ![Single Threaded Result](resources/result_s.jpg) | ![Multithreaded Result](resources/result_m.jpg) |
 
 ## Error Handling
 

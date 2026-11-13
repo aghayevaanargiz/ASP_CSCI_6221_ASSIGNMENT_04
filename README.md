@@ -282,12 +282,6 @@ The implementation was developed and checked incrementally.
 5. **Concurrency improvements:** The multithreaded implementation was refined to handle worker completion, worker errors, interruption, and safer numeric calculations.
 6. **Manual testing:** Both processing modes, selected argument errors, different square sizes, and a square size larger than the image were tested.
 
-## AI Usage Disclaimer
-
-This task was one of the most time consuming and challenging to handle on my own without AI assistance. Having never worked with threads before, implementing them for the first time was particularly demanding.
-
-AI assistance was used during development to review code organization, discuss concurrency and Swing event handling paradigms, refine error handling, and design manual test cases.
-
 ## Author
 
 **Nargiz Aghayeva**  
